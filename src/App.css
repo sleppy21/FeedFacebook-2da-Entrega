@@ -1,0 +1,537 @@
+/* Variables para personalizar el modal */
+:root {
+  --modal-width: 65%;      /* Ancho del modal */
+  --modal-height: 88%;      /* Alto del modal */
+  --modal-top: 50px;       /* Posición superior del modal */
+  --modal-left: calc(50% - 28%); /* Centrado horizontalmente (ancho/2) */
+  --modal-bg: #fff;        /* Fondo del modal */
+  
+  /* Variables para personalizar el lado derecho del modal */
+  --modal-right-bg: #fff;
+  --modal-right-padding: 26px;
+  --modal-right-font-size: 14px;
+  --modal-right-color: #000;
+}
+
+/* ===== Layout General ===== */
+body {
+  background-color: #fefeff; /* Gris claro estilo Facebook */
+  color: #1c1e21;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Contenedor de la Navbar */
+.custom-navbar {
+  position: fixed;
+  width: 100%;
+  background-color: #ffffff; /* Fondo blanco */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.048); /* Sombra hacia abajo */
+  z-index: 100;
+  padding-left: 20px;
+  padding-top: 8px;
+  font-family: 'Times New Roman', Times, serif;
+}
+
+/* Contenedor interno de la Navbar con distribución flexible */
+.custom-navbar .container-fluid {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Estilo para el enlace de la marca en la Navbar */
+.dropdown {
+  color: #000000ba;
+  font-size: 20px;
+  transform: translateX(-510%);
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+/* Estilo para el logo de Facebook */
+.fb-logo {
+  height: 38px; /* Ajusta según el tamaño deseado */
+  margin-right: 10px;
+  padding-top: 2px;
+}
+
+.fb-logo:hover {
+  transform: scale(1.1);
+}
+
+/* Caja contenedora para el <ul> */
+.ul-container {
+  background-color: #353535;
+  border-radius: 5px;
+  padding: 10px;
+  margin-left: 15px;
+  margin-right: 15px;
+}
+.titulo-container{
+  text-align: center;
+  color: #ffffff;
+  font-size: 18px;
+  font-family: Arial, Helvetica, sans-serif;
+  transform: translate(-15px,0);
+}
+.comentario-container{
+  color: #ffffff81;
+  transform: translate(-18px,4px);
+  font-size: 14px;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.comentario-container2{
+  color: #ffffff82;
+  transform: translate(-18px,-20px);
+  font-size: 14px;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.container-plantillas{
+  color: #ffffff;
+  transform: translate(-18px,0);
+  font-size: 14px;
+  align-items: center;
+
+}
+
+
+/* Barra lateral: Actualizado para ser fija */
+.sidebar {
+  position: fixed;
+  width: 400px; /* Ajusta este valor para cambiar el ancho del sidebar */
+  min-height: calc(100vh - 70px); /* Ocupa toda la altura de la pantalla menos el navbar */
+  background-color: #212021; /* Color oscuro */
+  color: #ffffff;
+  transform: translate(0,50px);
+  padding-bottom: 20px;
+}
+.n{
+  color: #ffffffe0;
+  text-align: center;
+  font-size: 17px;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  transform: translate(0,6px);
+}
+
+/* Contenido principal: se añade margen izquierdo para dejar espacio al sidebar fijo */
+.main-content {
+  flex: 1;
+  padding: 10px; /* Ajusta según tu diseño */
+  padding-top: 115px;
+  margin-left: 420px; /* Debe ser igual al ancho de la sidebar */
+}
+
+/* Fondo contenedor de posts */
+.fondo {
+  background-color: #f6f6f6a9;
+  transform: translate(-10px, -35px);
+  padding: 20px;
+  border-radius: 20px;
+  border: 3px solid #f1f0f0;
+}
+
+/* ===== Layout de publicaciones estilo “masonry” por defecto (Plantilla 1) ===== */
+.template-1 {
+  column-count: 3;      /* 3 columnas */
+  column-gap: 30px;     /* Espacio horizontal entre columnas */
+}
+
+/* Plantilla 2: Lista vertical */
+.template-2 {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Plantilla 3: Grid de 2 columnas */
+.template-3 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+/* Plantilla 4: Tarjetas con mayor separación (por ejemplo, estilo “cards”) */
+.template-4 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  justify-content: center;
+}
+
+/* Cada tarjeta se comporta como bloque “evitando quiebres” */
+.post-col {
+  display: inline-block;
+  width: 100%;
+  margin-bottom: 30px;
+  vertical-align: top;
+  break-inside: avoid;  /* Evita que la tarjeta se parta entre columnas */
+}
+
+/* Animación de fade-in para publicaciones */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Estilos de la Tarjeta de Publicación ===== */
+.fb-post {
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #fefeff;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  animation: fadeIn 0.5s ease-in-out;
+}
+.fb-post:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* Cabecera: foto, nombre y fecha */
+.fb-post-header {
+  background-color: #fff;
+  padding: 15px;
+  position: relative; /* Para posicionar el icono de enlace */
+}
+
+.profile-name {
+  transform: translate(50px, -27px);
+  color: #000000ce;
+  font-size: 0.95rem;
+}
+
+.profile-name2 {
+  transform: translate(38px, -27px);
+  color: #000000ce;
+  font-size: 0.95rem;
+}
+
+/* Imagen del autor */
+.fb-post-author-pic, .fb-post-author2-pic {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(0, 0, 0, 0.456); 
+}
+.fb-post-author-pic {
+  transform: translate(7px, 9px);
+}
+.fb-post-author2-pic {
+  transform: translate(-8px, 10px);
+}
+
+/* Fecha de publicación */
+.fb-post-date, .fb-post-date2 {
+  font-size: 0.75rem;
+  color: #60677098;
+  margin-top: 7px;
+}
+.fb-post-date {
+  transform: translate(50px, -34px);
+}
+.fb-post-date2 {
+  transform: translate(39px, -34px);
+}
+
+/* Cuerpo de la tarjeta */
+.fb-post-body {
+  flex: 1 1 auto;
+  transform: translate(0px, -47px);
+  padding: 0 20px;
+}
+
+.fb-post-message, .fb-post-message2 {
+  font-size: 0.92rem;
+  color: #000000a8;
+  line-height: 1.4;
+  white-space: pre-line;
+}
+.fb-post-message {
+  transform: translate(0,0);
+  padding-bottom: 5px;
+}
+.fb-post-message2 {
+  transform: translate(0,-28px);
+  margin: 10px 10px 0 10px;
+}
+
+/* Imagen de la publicación */
+.fb-post-image {
+  width: 98%;
+  max-height: 400px;
+  object-fit: cover;
+  display: block;
+  cursor: pointer;
+  padding-bottom: 6px;
+  transform: translate(3px, -5px);
+}
+
+/* ===== Sección de acciones: "Me gusta", comentarios, compartir ===== */
+.fb-post-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: -3px;
+  padding: 0 10px 10px;
+  font-size: 14px;
+  color: #606770;
+  transform: translate(0, 5px);
+}
+
+.fb-comments-count {
+  margin-left: 15px;
+  color: #606770;
+}
+
+.fb-post-share-btn {
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  color: #050505ca;
+  border-radius: 3px;
+  padding: 5px 10px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.23);
+  transform: translate(0,1px);
+}
+
+.fb-post-share-btn:hover {
+  background-color: #d8dadf67;
+}
+
+.fb-post-share-btn i {
+  margin-right: 5px;
+  font-size: 16px;
+  color: #606770;
+}
+
+/* ===== Estilos del Modal ===== */
+.modal {
+  display: none;
+  position: fixed; 
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.modal .modal-content {
+  position: absolute;
+  top: var(--modal-top);
+  left: var(--modal-left);
+  width: var(--modal-width);
+  height: var(--modal-height);
+  background-color: var(--modal-bg);
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  overflow: hidden;
+  transform: translate(150px,30px);
+}
+
+.modal .modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transform: translate(-1040px, 5px);
+}
+
+.modal-photo-content .modal-body {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+.modal-photo-left {
+  background-color: #000;
+  flex: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+}
+.modal-photo-left img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.modal-photo-right {
+  flex: 1;
+  background-color: var(--modal-right-bg);
+  font-size: var(--modal-right-font-size);
+  color: var(--modal-right-color);
+  display: flex;
+  flex-direction: column;
+  transform: translate(-5px,-20px);
+  margin: 20px;
+}
+
+/* ===== Estilos de Botones (Plantillas y Login) ===== */
+.login-facebook {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Espacio entre el logo y el texto */
+  background-color: #ffffff;
+  color: #000000df;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  transform: translate(20px,-10px);
+  font-size: 16px;
+  margin: 0;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.login-facebook:hover {
+  background-color: #166fe5;
+}
+
+.facebook-logo {
+  width: 20px;
+  height: 20px;
+}
+
+.plantilla-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.plantilla-btn {
+  background-color: #f0f0f05a;
+  color: #ffffffbe;
+  border: 1px solid #00000083;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.plantilla-btn:hover {
+  background-color: #ffffff69;
+}
+
+.plantilla-btn.active {
+  background-color: #ffffff;
+  color: #000000ac;
+  border-color: #00000082;
+  font-size: 15px;
+}
+
+/* Otros estilos existentes ... (mantén el resto de tu CSS original sin cambios) */
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #ffffff;
+  padding: 10px 20px;
+  width: 100%;
+  box-sizing: border-box;
+  padding-bottom: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.075);
+}
+
+.buttons {
+  display: flex;
+  gap: 10px;
+  transform: translate(-50px, 0);
+}
+
+.publish,
+.close, .embed {
+  border: none;
+  padding: 12px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.publish {
+  background-color: #e6f9ea;
+  color: #9bd97d;
+  font-weight: 700;
+}
+.publish:hover {
+  background-color: #d3f2da;
+}
+.close {
+  background-color: #e0e0e089;
+  color: #000000c8;
+}
+.close:hover {
+  background-color: #e6e6e6;
+}
+.embed {
+  background-color: #f0f0f0;
+  color: #999999;
+}
+.embed:hover {
+  background-color: #e6e6e6;
+}
+
+.text-center{
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #606770;
+
+}
+/* Add these styles to your App.css */
+@keyframes slideIn {
+  from {
+    transform: translateX(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100px);
+    opacity: 0;
+  }
+}
+
+.post-col {
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
+}
+
+.slide-in {
+  animation-name: slideIn;
+}
+
+.slide-out {
+  animation-name: slideOut;
+}
