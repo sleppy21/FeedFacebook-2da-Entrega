@@ -18,31 +18,39 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
+  overflow: hidden; /* Oculta scrollbar en todo el body */
+
 }
 
 .custom-navbar {
   position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
+  height: 45px; /* Ajusta según tu preferencia */
   background-color: #ffffff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.048);
-  z-index: 100;
-  padding-left: 20px;
-  padding-top: 8px;
+  z-index: 1000; /* Para que quede por encima del contenido */
+  padding-left: 2px;
   font-family: 'Times New Roman', Times, serif;
+  display: flex; /* Para alinear contenido interno */
+  align-items: center;
 }
 
 .custom-navbar .container-fluid {
+  position: relative; 
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-between; /* Logo a la izq, botones a la der */
+  padding: 0 10px;
+  color: #000000d3;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-size: 17px;  
 }
 
-.dropdown {
-  color: #000000ba;
-  font-size: 20px;
-  transform: translateX(-510%);
-  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-}
+
 
 .fb-logo {
   height: 38px;
@@ -110,13 +118,19 @@ body {
 }
 
 .main-content {
-  flex: 1;
+  position: absolute;
+  top: 60px; /* Igual a la altura del navbar */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto; /* Aquí aparece el scrollbar */
   padding: 10px;
-  padding-top: 115px;
-  margin-left: 420px;
+  padding-top: 55px; /* Ajusta según tu diseño */
+  margin-left: 420px; /* Mantén si tienes sidebar fija a la izquierda */
+  /* Asegúrate de quitar "margin-left: 420px;" si no tienes sidebar */
 }
 
-/* Fondo contenedor de posts */
+/* Fondo contenedor de posts (Widget) */
 .fondo {
   background-color: #f6f6f6a9;
   transform: translate(-10px, -35px);
@@ -150,17 +164,6 @@ body {
   animation: verticalShrinkMinor 0.5s ease;
 }
 
-@keyframes verticalShrink {
-  0% { transform: scaleY(1); }
-  50% { transform: scaleY(0.95); }
-  100% { transform: scaleY(1); }
-}
-
-@keyframes verticalShrinkMinor {
-  0% { transform: scaleY(1); }
-  50% { transform: scaleY(0.98); }
-  100% { transform: scaleY(1); }
-}
 
 @keyframes fondoCambio {
   0% { transform: translate(-10px, -35px) scale(1); }
@@ -171,11 +174,11 @@ body {
 
 /* ===== Layout de publicaciones ===== */
 
-/* Plantilla 1: Vista Apilada (3x3 Grid) */
+/* Plantilla 1: Vista Apilada (Masonry Layout) */
+/* Se utiliza column-count para lograr un efecto de apilado sin espacios sobrantes */
 .fondo.template-1 {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 30px;
+  column-count: 3;
+  column-gap: 30px;
 }
 
 /* Plantilla 2: Vista Celular */
@@ -200,6 +203,7 @@ body {
   justify-content: center;
 }
 
+/* Configuración de cada tarjeta */
 .post-col {
   display: inline-block;
   width: 100%;
@@ -504,6 +508,7 @@ body {
   background-color: #f0f0f05a;
   color: #ffffffbe;
   border: 1px solid #00000083;
+  height: 37px;
   padding: 8px 12px;
   border-radius: 5px;
   cursor: pointer;
@@ -540,12 +545,18 @@ body {
 }
 
 .publish,
-.close, .embed {
+.close, 
+.embed {
+  transform: translateX(40px);
   border: none;
-  padding: 12px 12px;
+  padding: 13px 13px;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  line-height: 1;
+  white-space: nowrap; /* Evita que el texto se divida en varias líneas */
+  overflow: hidden; /* Previene desbordamientos */
+  text-overflow: ellipsis; /* Opcional: muestra "..." si el texto es muy largo */
 }
 
 .publish {
@@ -559,7 +570,7 @@ body {
 }
 
 .close {
-  background-color: #e0e0e089;
+  background-color: #e0e0e064;
   color: #000000c8;
 }
 
@@ -587,4 +598,25 @@ body {
 #posts {
   position: relative;
   min-height: 100vh;
+}
+
+body::-webkit-scrollbar {
+  transform: translate(-20px,20px);
+  width: 20px;
+}
+body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+body::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+body::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Para Firefox (usa scrollbar-width y scrollbar-color) */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
 }

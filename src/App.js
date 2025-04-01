@@ -42,7 +42,22 @@ function App() {
   const [embedModalOpen, setEmbedModalOpen] = useState(false);
   const [embedCode, setEmbedCode] = useState('');
 
+  // Detectar si se accede en modo embed
+  const isEmbed = window.location.search.includes('embed=true');
+
   useEffect(() => {
+    // Si está en modo embed, tratar de cargar datos desde localStorage
+    if (isEmbed) {
+      const storedProfile = localStorage.getItem('profile');
+      const storedPosts = localStorage.getItem('posts');
+      if (storedProfile && storedPosts) {
+        setProfile(JSON.parse(storedProfile));
+        setPosts(JSON.parse(storedPosts));
+      }
+      // En modo embed, se muestra solo el widget (las tarjetas)
+      return;
+    }
+
     if (window.FB) {
       setSdkLoaded(true);
       return;
@@ -69,7 +84,7 @@ function App() {
       };
       fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));
-  }, []);
+  }, [isEmbed]);
 
   const handleLogin = () => {
     if (!sdkLoaded) {
@@ -93,10 +108,14 @@ function App() {
       window.FB.logout(() => {
         setProfile(null);
         setPosts([]);
+        localStorage.removeItem('profile');
+        localStorage.removeItem('posts');
       });
     } else {
       setProfile(null);
       setPosts([]);
+      localStorage.removeItem('profile');
+      localStorage.removeItem('posts');
     }
   };
 
@@ -104,6 +123,7 @@ function App() {
     window.FB.api('/me', { fields: 'name,picture.width(60).height(60)', access_token: token }, function (response) {
       if (response && !response.error) {
         setProfile(response);
+        localStorage.setItem('profile', JSON.stringify(response));
         fetchPosts(token);
       } else {
         console.error('Error al obtener el perfil:', response.error);
@@ -130,6 +150,7 @@ function App() {
     window.FB.api(`/me/posts`, { fields, access_token: token }, function (response) {
       if (response && !response.error) {
         setPosts(response.data || []);
+        localStorage.setItem('posts', JSON.stringify(response.data || []));
       } else {
         console.error('Error al obtener las publicaciones:', response.error);
       }
@@ -156,9 +177,9 @@ function App() {
       (post.angry_reactions?.summary?.total_count || 0);
   };
 
-  // Función para generar el código embed según la plantilla actual
+  // Función para generar el código embed (solo del widget .fondo)
   const handleGenerateEmbed = () => {
-    // Se asume que tu widget se puede mostrar en un iframe usando un query param para el template
+    // Se genera la URL con el template actual y embed=true
     const embedUrl = `${window.location.origin}/?embed=true&template=${selectedTemplate}`;
     const code = `<iframe src="${embedUrl}" width="600" height="800" frameborder="0"></iframe>`;
     setEmbedCode(code);
@@ -215,6 +236,44 @@ function App() {
     });
   };
 
+  // Si estamos en modo embed, se renderiza solo el widget
+  if (isEmbed) {
+    return (
+      <div className="App">
+        {profile && posts.length > 0 ? (
+          <div id="posts" className={`fondo template-${selectedTemplate}`}>
+            {posts.map((post) => (
+              <div key={post.id} className="post-col">
+                <div className="fb-post">
+                  <div className="fb-post-header">
+                    {profile.picture && (
+                      <img src={profile.picture.data.url} alt={profile.name} className="fb-post-author-pic" />
+                    )}
+                    {profile.name && <div className="profile-name">{profile.name}</div>}
+                    {post.created_time && <div className="fb-post-date">{formatDate(post.created_time)}</div>}
+                  </div>
+                  <div className="fb-post-body">
+                    {post.message && <p className="fb-post-message">{post.message}</p>}
+                    {post.full_picture && (
+                      <img
+                        src={post.full_picture}
+                        alt="Imagen de la publicación"
+                        className="fb-post-image"
+                        onClick={() => openModal(post)}
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p>No hay publicaciones para mostrar.</p>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="App">
       {/* Navbar */}
@@ -224,10 +283,11 @@ function App() {
             src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg"
             alt="Logo de Facebook"
             className="fb-logo"
+            
           />
-          <div className="dropdown"><a>Feed Facebook</a></div>
+          <div className="container-fluid"><a>Feed Facebook</a></div>
           <div className="buttons">
-            <button className="embed" onClick={handleGenerateEmbed}>Generar Embed</button>
+            <button className="embed" onClick={handleGenerateEmbed}>Genera Codigo Embed</button>
             <button className="publish">Publish</button>
             <button className="close" onClick={handleLogout}>Close</button>
           </div>
@@ -244,9 +304,7 @@ function App() {
               Authorize in your Facebook account to display the page you manage.
             </p>
             <br />
-            <p className="comentario-container2">
-              Que estresante sacar el api de facebook
-            </p>
+            <p className="comentario-container2">Que estresante sacar el api de facebook</p>
             <p>
               {!profile && (
                 <button className="login-facebook" onClick={handleLogin}>
@@ -259,29 +317,31 @@ function App() {
                 </button>
               )}
             </p>
-            <p className="container-plantillas">
-              <h7>Plantillas:</h7>
-              <div className="plantilla-buttons">
-                <button
-                  className={`plantilla-btn ${selectedTemplate === 1 ? 'active' : ''}`}
-                  onClick={() => handleTemplateChange(1)}
-                >
-                  Plantilla en Vista Apilada
-                </button>
-                <button
-                  className={`plantilla-btn ${selectedTemplate === 2 ? 'active' : ''}`}
-                  onClick={() => handleTemplateChange(2)}
-                >
-                  Plantilla Vista Celular
-                </button>
-                <button
-                  className={`plantilla-btn ${selectedTemplate === 3 ? 'active' : ''}`}
-                  onClick={() => handleTemplateChange(3)}
-                >
-                  Plantilla Vista Tablet
-                </button>
-              </div>
-            </p>
+            {profile && (
+              <p className="container-plantillas">
+                <h7>Plantillas:</h7>
+                <div className="plantilla-buttons">
+                  <button
+                    className={`plantilla-btn ${selectedTemplate === 1 ? 'active' : ''}`}
+                    onClick={() => handleTemplateChange(1)}
+                  >
+                    Plantilla en Vista Apilada
+                  </button>
+                  <button
+                    className={`plantilla-btn ${selectedTemplate === 2 ? 'active' : ''}`}
+                    onClick={() => handleTemplateChange(2)}
+                  >
+                    Plantilla Vista Celular
+                  </button>
+                  <button
+                    className={`plantilla-btn ${selectedTemplate === 3 ? 'active' : ''}`}
+                    onClick={() => handleTemplateChange(3)}
+                  >
+                    Plantilla Vista Tablet
+                  </button>
+                </div>
+              </p>
+            )}
           </ul>
         </div>
       </aside>
@@ -300,31 +360,16 @@ function App() {
           <div id="posts" className={`fondo template-${selectedTemplate}`}>
             {posts.map((post) => (
               <div key={post.id} className="post-col d-flex">
-                <div className="fb-post h-100 d-flex flex-column">
-                  <div className="fb-post-header" style={{ position: 'relative' }}>
-                    <div className="header-top-container d-flex align-items-center">
-                      {profile.picture && (
-                        <img src={profile.picture.data.url} alt={profile.name} className="fb-post-author-pic me-2" />
-                      )}
-                      {profile.name && (
-                        <div className="profile-name">{profile.name}</div>
-                      )}
-                      {post.permalink_url && (
-                        <a href={post.permalink_url} target="_blank" rel="noopener noreferrer" className="post-link-icon">
-                          <i className="bi bi-box-arrow-up-right"></i>
-                        </a>
-                      )}
-                    </div>
-                    {post.created_time && (
-                      <div className="fb-post-date">
-                        {formatDate(post.created_time)}
-                      </div>
+                <div className="fb-post">
+                  <div className="fb-post-header">
+                    {profile.picture && (
+                      <img src={profile.picture.data.url} alt={profile.name} className="fb-post-author-pic" />
                     )}
+                    {profile.name && <div className="profile-name">{profile.name}</div>}
+                    {post.created_time && <div className="fb-post-date">{formatDate(post.created_time)}</div>}
                   </div>
-                  <div className="fb-post-body d-flex flex-column">
-                    {post.message && (
-                      <p className="fb-post-message">{post.message}</p>
-                    )}
+                  <div className="fb-post-body">
+                    {post.message && <p className="fb-post-message">{post.message}</p>}
                     {post.full_picture && (
                       <img
                         src={post.full_picture}
@@ -385,10 +430,10 @@ function App() {
                 <img src={modalPost.full_picture} alt="Imagen de la publicación" />
               </div>
               <div className="modal-photo-right" id="modalPhotoInfo">
-                <div className="fb-post-header d-flex flex-column">
+                <div className="fb-post-header">
                   <div className="d-flex align-items-center">
                     {profile && profile.picture && (
-                      <img src={profile.picture.data.url} alt={profile.name} className="fb-post-author2-pic me-2" />
+                      <img src={profile.picture.data.url} alt={profile.name} className="fb-post-author2-pic" />
                     )}
                     {profile && profile.name && (
                       <div className="profile-name2">{profile.name}</div>
