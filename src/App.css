@@ -131,22 +131,46 @@ body {
   padding: 20px;
   border-radius: 20px;
   border: 3px solid #f1f0f0;
+  animation: fondoEntrada 1s ease-out;
+  transition: transform 0.8s ease, background-color 0.8s ease;
+}
+
+@keyframes fondoEntrada {
+  0% {
+    transform: translate(-10px, -35px);
+  }
+  50% {
+    transform: translate(-10px, -35px);
+  }
+  100% {
+    transform: translate(-10px, -35px);
+  }
+}
+
+/* Animación al cambiar plantillas */
+.fondo.template-changing {
+  animation: fondoCambio 1s ease;
+}
+
+@keyframes fondoCambio {
+  0% { transform: translate(-10px, -35px) scale(1); }
+  30% { transform: translate(-10px, -35px) scale(0.98); }
+  70% { transform: translate(-10px, -35px) scale(1.02); }
+  100% { transform: translate(-10px, -35px) scale(1); }
 }
 
 /* ===== Layout de publicaciones estilo “masonry” por defecto (Plantilla 1) ===== */
 .template-1 {
-  column-count: 3;      /* 3 columnas */
-  column-gap: 30px;     /* Espacio horizontal entre columnas */
+  column-count: 3;
+  column-gap: 30px;
 }
 
-/* Plantilla 2: Lista vertical */
 .template-2 {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-/* Plantilla 3: Grid de 2 columnas */
 .template-3 {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -168,6 +192,9 @@ body {
   margin-bottom: 30px;
   vertical-align: top;
   break-inside: avoid;  /* Evita que la tarjeta se parta entre columnas */
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+
 }
 
 /* Animación de fade-in para publicaciones */
@@ -501,27 +528,7 @@ body {
 
 }
 /* Add these styles to your App.css */
-@keyframes slideIn {
-  from {
-    transform: translateX(100px);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
 
-@keyframes slideOut {
-  from {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  to {
-    transform: translateX(-100px);
-    opacity: 0;
-  }
-}
 
 .post-col {
   animation-duration: 0.5s;
@@ -534,4 +541,9 @@ body {
 
 .slide-out {
   animation-name: slideOut;
+}
+
+#posts {
+  position: relative;
+  min-height: 100vh;
 }

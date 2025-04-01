@@ -153,11 +153,47 @@ function App() {
   };
 
   const handleTemplateChange = (templateNumber) => {
-    document.getElementById('posts').style.animation = 'none';
-    void document.getElementById('posts').offsetHeight; 
-    document.getElementById('posts').style.animation = null;
+    const postsContainer = document.getElementById('posts');
+    const fondo = document.querySelector('.fondo');
+
+    const posts = Array.from(postsContainer.children);
+    fondo.classList.add('template-changing');
+
+    setTimeout(() => {
+      fondo.classList.remove('template-changing');
+    }, 500);
+    
+    // 1. Guardar posición inicial
+    const firstRects = posts.map(post => post.getBoundingClientRect());
+    
+    // 2. Cambiar plantilla
     setSelectedTemplate(templateNumber);
+    
+    // 3. Obtener posición final después del cambio
+    requestAnimationFrame(() => {
+      const lastRects = posts.map(post => post.getBoundingClientRect());
+
+
+      // 4. Aplicar transformación inversa
+      posts.forEach((post, index) => {
+        const first = firstRects[index];
+        const last = lastRects[index];
+        
+        const deltaX = first.left - last.left;
+        const deltaY = first.top - last.top;
+        
+        post.animate([{
+          transform: `translate(${deltaX}px, ${deltaY}px)`
+        }, {
+          transform: 'none'
+        }], {
+          duration: 500,
+          easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
+        });
+      });
+    });
   };
+
 
   return (
     <div className="App">
