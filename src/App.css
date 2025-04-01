@@ -56,10 +56,12 @@ body {
   height: 38px;
   margin-right: 10px;
   padding-top: 2px;
+  cursor: pointer; /* Esto muestra la manito al pasar el mouse */
+
 }
 
 .fb-logo:hover {
-  transform: scale(1.1);
+  transform: scale(1.01);
 }
 
 .ul-container {
@@ -138,6 +140,15 @@ body {
   border-radius: 20px;
   border: 3px solid #f1f0f0;
   animation: fondoEntrada 1s ease-out;
+  transition: height 0.5s ease, transform 0.5s ease, background-color 0.8s ease;
+}
+
+.fondo2 {
+  background-color: #f6f6f6a9;
+  transform: translate(-10px, -35px);
+  padding: 20px;
+  border-radius: 20px;
+  border: 3px solid #f1f0f0;
   transition: height 0.5s ease, transform 0.5s ease, background-color 0.8s ease;
 }
 
@@ -619,4 +630,18 @@ body::-webkit-scrollbar-thumb:hover {
 html {
   scrollbar-width: thin;
   scrollbar-color: #888 #f1f1f1;
+}
+
+.demo-mode {
+  display: block;
+  text-align: center;
+  background: none;
+  border: none;
+  color: #dbdbdbcf;
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+  margin: 10px 0;
+  align-content: center;
+  padding-left: 100px;
 }
