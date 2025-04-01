@@ -1,12 +1,10 @@
-/* Variables para personalizar el modal */
 :root {
-  --modal-width: 65%;      /* Ancho del modal */
-  --modal-height: 88%;      /* Alto del modal */
-  --modal-top: 50px;       /* Posición superior del modal */
-  --modal-left: calc(50% - 28%); /* Centrado horizontalmente (ancho/2) */
-  --modal-bg: #fff;        /* Fondo del modal */
+  --modal-width: 65%;
+  --modal-height: 88%;
+  --modal-top: 50px;
+  --modal-left: calc(50% - 28%);
+  --modal-bg: #fff;
   
-  /* Variables para personalizar el lado derecho del modal */
   --modal-right-bg: #fff;
   --modal-right-padding: 26px;
   --modal-right-font-size: 14px;
@@ -15,33 +13,30 @@
 
 /* ===== Layout General ===== */
 body {
-  background-color: #fefeff; /* Gris claro estilo Facebook */
+  background-color: #fefeff;
   color: #1c1e21;
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
 }
 
-/* Contenedor de la Navbar */
 .custom-navbar {
   position: fixed;
   width: 100%;
-  background-color: #ffffff; /* Fondo blanco */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.048); /* Sombra hacia abajo */
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.048);
   z-index: 100;
   padding-left: 20px;
   padding-top: 8px;
   font-family: 'Times New Roman', Times, serif;
 }
 
-/* Contenedor interno de la Navbar con distribución flexible */
 .custom-navbar .container-fluid {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-/* Estilo para el enlace de la marca en la Navbar */
 .dropdown {
   color: #000000ba;
   font-size: 20px;
@@ -49,9 +44,8 @@ body {
   font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
-/* Estilo para el logo de Facebook */
 .fb-logo {
-  height: 38px; /* Ajusta según el tamaño deseado */
+  height: 38px;
   margin-right: 10px;
   padding-top: 2px;
 }
@@ -60,7 +54,6 @@ body {
   transform: scale(1.1);
 }
 
-/* Caja contenedora para el <ul> */
 .ul-container {
   background-color: #353535;
   border-radius: 5px;
@@ -68,6 +61,7 @@ body {
   margin-left: 15px;
   margin-right: 15px;
 }
+
 .titulo-container{
   text-align: center;
   color: #ffffff;
@@ -75,6 +69,7 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   transform: translate(-15px,0);
 }
+
 .comentario-container{
   color: #ffffff81;
   transform: translate(-18px,4px);
@@ -94,20 +89,18 @@ body {
   transform: translate(-18px,0);
   font-size: 14px;
   align-items: center;
-
 }
 
-
-/* Barra lateral: Actualizado para ser fija */
 .sidebar {
   position: fixed;
-  width: 400px; /* Ajusta este valor para cambiar el ancho del sidebar */
-  min-height: calc(100vh - 70px); /* Ocupa toda la altura de la pantalla menos el navbar */
-  background-color: #212021; /* Color oscuro */
+  width: 400px;
+  min-height: calc(100vh - 70px);
+  background-color: #212021;
   color: #ffffff;
   transform: translate(0,50px);
   padding-bottom: 20px;
 }
+
 .n{
   color: #ffffffe0;
   text-align: center;
@@ -116,12 +109,11 @@ body {
   transform: translate(0,6px);
 }
 
-/* Contenido principal: se añade margen izquierdo para dejar espacio al sidebar fijo */
 .main-content {
   flex: 1;
-  padding: 10px; /* Ajusta según tu diseño */
+  padding: 10px;
   padding-top: 115px;
-  margin-left: 420px; /* Debe ser igual al ancho de la sidebar */
+  margin-left: 420px;
 }
 
 /* Fondo contenedor de posts */
@@ -132,24 +124,43 @@ body {
   border-radius: 20px;
   border: 3px solid #f1f0f0;
   animation: fondoEntrada 1s ease-out;
-  transition: transform 0.8s ease, background-color 0.8s ease;
+  transition: height 0.5s ease, transform 0.5s ease, background-color 0.8s ease;
 }
 
 @keyframes fondoEntrada {
   0% {
     transform: translate(-10px, -35px);
+    opacity: 0;
   }
   50% {
     transform: translate(-10px, -35px);
+    opacity: 1;
   }
   100% {
     transform: translate(-10px, -35px);
   }
 }
 
-/* Animación al cambiar plantillas */
+/* Animación cuando se cambia de plantilla */
 .fondo.template-changing {
-  animation: fondoCambio 1s ease;
+  animation: verticalShrink 0.5s ease, fondoCambio 1s ease;
+}
+
+/* Animación menos exagerada para la misma plantilla */
+.fondo.template-changing-minor {
+  animation: verticalShrinkMinor 0.5s ease;
+}
+
+@keyframes verticalShrink {
+  0% { transform: scaleY(1); }
+  50% { transform: scaleY(0.95); }
+  100% { transform: scaleY(1); }
+}
+
+@keyframes verticalShrinkMinor {
+  0% { transform: scaleY(1); }
+  50% { transform: scaleY(0.98); }
+  100% { transform: scaleY(1); }
 }
 
 @keyframes fondoCambio {
@@ -159,51 +170,54 @@ body {
   100% { transform: translate(-10px, -35px) scale(1); }
 }
 
-/* ===== Layout de publicaciones estilo “masonry” por defecto (Plantilla 1) ===== */
-.template-1 {
-  column-count: 3;
-  column-gap: 30px;
+/* ===== Layout de publicaciones ===== */
+
+/* Plantilla 1: Vista Apilada (3x3 Grid) */
+.fondo.template-1 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
 }
 
-.template-2 {
+/* Plantilla 2: Vista Celular */
+.fondo.template-2 {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.template-3 {
+/* Plantilla 3: Vista Tablet */
+.fondo.template-3 {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
 }
 
-/* Plantilla 4: Tarjetas con mayor separación (por ejemplo, estilo “cards”) */
-.template-4 {
+/* Plantilla 4 (si se llegara a usar): Tarjetas estilo cards */
+.fondo.template-4 {
   display: flex;
   flex-wrap: wrap;
   gap: 30px;
   justify-content: center;
 }
 
-/* Cada tarjeta se comporta como bloque “evitando quiebres” */
 .post-col {
   display: inline-block;
   width: 100%;
   margin-bottom: 30px;
   vertical-align: top;
-  break-inside: avoid;  /* Evita que la tarjeta se parta entre columnas */
+  break-inside: avoid;
   transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform;
-
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
 }
 
-/* Animación de fade-in para publicaciones */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ===== Estilos de la Tarjeta de Publicación ===== */
 .fb-post {
   width: 100%;
   box-sizing: border-box;
@@ -214,16 +228,16 @@ body {
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
   animation: fadeIn 0.5s ease-in-out;
 }
+
 .fb-post:hover {
   transform: translateY(-3px);
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
-/* Cabecera: foto, nombre y fecha */
 .fb-post-header {
   background-color: #fff;
   padding: 15px;
-  position: relative; /* Para posicionar el icono de enlace */
+  position: relative;
 }
 
 .profile-name {
@@ -238,7 +252,6 @@ body {
   font-size: 0.95rem;
 }
 
-/* Imagen del autor */
 .fb-post-author-pic, .fb-post-author2-pic {
   width: 35px;
   height: 35px;
@@ -246,27 +259,29 @@ body {
   object-fit: cover;
   border: 1px solid rgba(0, 0, 0, 0.456); 
 }
+
 .fb-post-author-pic {
   transform: translate(7px, 9px);
 }
+
 .fb-post-author2-pic {
   transform: translate(-8px, 10px);
 }
 
-/* Fecha de publicación */
 .fb-post-date, .fb-post-date2 {
   font-size: 0.75rem;
   color: #60677098;
   margin-top: 7px;
 }
+
 .fb-post-date {
   transform: translate(50px, -34px);
 }
+
 .fb-post-date2 {
   transform: translate(39px, -34px);
 }
 
-/* Cuerpo de la tarjeta */
 .fb-post-body {
   flex: 1 1 auto;
   transform: translate(0px, -47px);
@@ -279,16 +294,17 @@ body {
   line-height: 1.4;
   white-space: pre-line;
 }
+
 .fb-post-message {
   transform: translate(0,0);
   padding-bottom: 5px;
 }
+
 .fb-post-message2 {
   transform: translate(0,-28px);
   margin: 10px 10px 0 10px;
 }
 
-/* Imagen de la publicación */
 .fb-post-image {
   width: 98%;
   max-height: 400px;
@@ -299,7 +315,6 @@ body {
   transform: translate(3px, -5px);
 }
 
-/* ===== Sección de acciones: "Me gusta", comentarios, compartir ===== */
 .fb-post-actions {
   display: flex;
   align-items: center;
@@ -341,7 +356,6 @@ body {
   color: #606770;
 }
 
-/* ===== Estilos del Modal ===== */
 .modal {
   display: none;
   position: fixed; 
@@ -395,6 +409,7 @@ body {
   padding: 0;
   margin: 0;
 }
+
 .modal-photo-left img {
   max-width: 100%;
   max-height: 100%;
@@ -412,21 +427,19 @@ body {
   margin: 20px;
 }
 
-/* ===== Estilos de Botones (Plantillas y Login) ===== */
 .login-facebook {
   display: flex;
   align-items: center;
-  gap: 8px; /* Espacio entre el logo y el texto */
+  gap: 8px;
   background-color: #ffffff;
   color: #000000df;
   border: none;
   padding: 10px 15px;
   border-radius: 5px;
-  font-size: 0.9rem;
+  font-size: 16px;
   cursor: pointer;
   transition: background-color 0.3s ease;
   transform: translate(20px,-10px);
-  font-size: 16px;
   margin: 0;
   font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
@@ -468,7 +481,6 @@ body {
   font-size: 15px;
 }
 
-/* Otros estilos existentes ... (mantén el resto de tu CSS original sin cambios) */
 .banner {
   display: flex;
   align-items: center;
@@ -501,20 +513,25 @@ body {
   color: #9bd97d;
   font-weight: 700;
 }
+
 .publish:hover {
   background-color: #d3f2da;
 }
+
 .close {
   background-color: #e0e0e089;
   color: #000000c8;
 }
+
 .close:hover {
   background-color: #e6e6e6;
 }
+
 .embed {
   background-color: #f0f0f0;
   color: #999999;
 }
+
 .embed:hover {
   background-color: #e6e6e6;
 }
@@ -525,22 +542,6 @@ body {
   font-size: 1.2rem;
   font-weight: 600;
   color: #606770;
-
-}
-/* Add these styles to your App.css */
-
-
-.post-col {
-  animation-duration: 0.5s;
-  animation-fill-mode: forwards;
-}
-
-.slide-in {
-  animation-name: slideIn;
-}
-
-.slide-out {
-  animation-name: slideOut;
 }
 
 #posts {

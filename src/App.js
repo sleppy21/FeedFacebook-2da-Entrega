@@ -86,7 +86,7 @@ function App() {
 
   const handleLogout = () => {
     if (window.FB) {
-      window.FB.logout((response) => {
+      window.FB.logout(() => {
         setProfile(null);
         setPosts([]);
       });
@@ -153,35 +153,44 @@ function App() {
   };
 
   const handleTemplateChange = (templateNumber) => {
+    // Detectar si se hizo click en la misma plantilla
+    const isSameTemplate = selectedTemplate === templateNumber;
     const postsContainer = document.getElementById('posts');
     const fondo = document.querySelector('.fondo');
-
-    const posts = Array.from(postsContainer.children);
-    fondo.classList.add('template-changing');
-
-    setTimeout(() => {
-      fondo.classList.remove('template-changing');
-    }, 500);
+    const postElements = Array.from(postsContainer.children);
     
-    // 1. Guardar posición inicial
-    const firstRects = posts.map(post => post.getBoundingClientRect());
+    // Agregar clase de animación según corresponda
+    if (isSameTemplate) {
+      fondo.classList.add('template-changing-minor');
+      setTimeout(() => {
+        fondo.classList.remove('template-changing-minor');
+      }, 500);
+    } else {
+      fondo.classList.add('template-changing');
+      setTimeout(() => {
+        fondo.classList.remove('template-changing');
+      }, 500);
+    }
     
-    // 2. Cambiar plantilla
+    // Guardar posición inicial de cada tarjeta
+    const firstRects = postElements.map(post => post.getBoundingClientRect());
+    
+    // Actualizar la plantilla (si es la misma se mantendrá, pero se ejecuta animación)
     setSelectedTemplate(templateNumber);
     
-    // 3. Obtener posición final después del cambio
+    // Calcular las posiciones finales y aplicar animación a cada tarjeta
     requestAnimationFrame(() => {
-      const lastRects = posts.map(post => post.getBoundingClientRect());
-
-
-      // 4. Aplicar transformación inversa
-      posts.forEach((post, index) => {
+      const lastRects = postElements.map(post => post.getBoundingClientRect());
+      postElements.forEach((post, index) => {
         const first = firstRects[index];
         const last = lastRects[index];
-        
-        const deltaX = first.left - last.left;
-        const deltaY = first.top - last.top;
-        
+        let deltaX = first.left - last.left;
+        let deltaY = first.top - last.top;
+        // Reducir el movimiento si se selecciona la misma plantilla
+        if (isSameTemplate) {
+          deltaX *= 0.3;
+          deltaY *= 0.3;
+        }
         post.animate([{
           transform: `translate(${deltaX}px, ${deltaY}px)`
         }, {
@@ -193,7 +202,6 @@ function App() {
       });
     });
   };
-
 
   return (
     <div className="App">
@@ -417,7 +425,7 @@ function App() {
   );
 }
 
-// Interceptar errores en la consola (opcional, si no se hizo al inicio)
+// Interceptar errores en la consola (opcional)
 if (window.console && window.console.error) {
   const originalConsoleError = window.console.error;
   window.console.error = function (message, ...args) {
@@ -429,4 +437,3 @@ if (window.console && window.console.error) {
 }
 
 export default App;
-// En la función handleTemplateChange:
