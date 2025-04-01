@@ -37,6 +37,10 @@ function App() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalPost, setModalPost] = useState(null);
   const [selectedTemplate, setSelectedTemplate] = useState(1);
+  
+  // Estados para la modal de Embed
+  const [embedModalOpen, setEmbedModalOpen] = useState(false);
+  const [embedCode, setEmbedCode] = useState('');
 
   useEffect(() => {
     if (window.FB) {
@@ -152,14 +156,27 @@ function App() {
       (post.angry_reactions?.summary?.total_count || 0);
   };
 
+  // Función para generar el código embed según la plantilla actual
+  const handleGenerateEmbed = () => {
+    // Se asume que tu widget se puede mostrar en un iframe usando un query param para el template
+    const embedUrl = `${window.location.origin}/?embed=true&template=${selectedTemplate}`;
+    const code = `<iframe src="${embedUrl}" width="600" height="800" frameborder="0"></iframe>`;
+    setEmbedCode(code);
+    setEmbedModalOpen(true);
+  };
+
+  // Función para copiar al portapapeles
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(embedCode);
+    alert('Código copiado al portapapeles');
+  };
+
   const handleTemplateChange = (templateNumber) => {
-    // Detectar si se hizo click en la misma plantilla
     const isSameTemplate = selectedTemplate === templateNumber;
     const postsContainer = document.getElementById('posts');
     const fondo = document.querySelector('.fondo');
     const postElements = Array.from(postsContainer.children);
     
-    // Agregar clase de animación según corresponda
     if (isSameTemplate) {
       fondo.classList.add('template-changing-minor');
       setTimeout(() => {
@@ -172,13 +189,9 @@ function App() {
       }, 500);
     }
     
-    // Guardar posición inicial de cada tarjeta
     const firstRects = postElements.map(post => post.getBoundingClientRect());
-    
-    // Actualizar la plantilla (si es la misma se mantendrá, pero se ejecuta animación)
     setSelectedTemplate(templateNumber);
     
-    // Calcular las posiciones finales y aplicar animación a cada tarjeta
     requestAnimationFrame(() => {
       const lastRects = postElements.map(post => post.getBoundingClientRect());
       postElements.forEach((post, index) => {
@@ -186,7 +199,6 @@ function App() {
         const last = lastRects[index];
         let deltaX = first.left - last.left;
         let deltaY = first.top - last.top;
-        // Reducir el movimiento si se selecciona la misma plantilla
         if (isSameTemplate) {
           deltaX *= 0.3;
           deltaY *= 0.3;
@@ -215,7 +227,7 @@ function App() {
           />
           <div className="dropdown"><a>Feed Facebook</a></div>
           <div className="buttons">
-            <button className="embed">Generar Embed</button>
+            <button className="embed" onClick={handleGenerateEmbed}>Generar Embed</button>
             <button className="publish">Publish</button>
             <button className="close" onClick={handleLogout}>Close</button>
           </div>
@@ -417,6 +429,33 @@ function App() {
                   )}
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Embed */}
+      {embedModalOpen && (
+        <div 
+          className="modal embed-modal" 
+          style={{ display: 'flex' }}
+          onClick={(e) => {
+            if (e.target.className.includes('embed-modal')) {
+              setEmbedModalOpen(false);
+            }
+          }}
+        >
+          <div className="modal-content embed-modal-content">
+            <button className="modal-close" onClick={() => setEmbedModalOpen(false)}>X</button>
+            <div className="modal-body">
+              <h3>Código Embed</h3>
+              <textarea 
+                className="embed-textarea" 
+                readOnly 
+                value={embedCode} 
+                onClick={(e) => e.target.select()}
+              />
+              <button className="copy-btn" onClick={copyToClipboard}>Copiar Código</button>
             </div>
           </div>
         </div>

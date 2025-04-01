@@ -141,12 +141,11 @@ body {
   }
 }
 
-/* Animación cuando se cambia de plantilla */
+/* Animaciones para cambio de plantilla */
 .fondo.template-changing {
   animation: verticalShrink 0.5s ease, fondoCambio 1s ease;
 }
 
-/* Animación menos exagerada para la misma plantilla */
 .fondo.template-changing-minor {
   animation: verticalShrinkMinor 0.5s ease;
 }
@@ -366,6 +365,7 @@ body {
   background-color: rgba(0, 0, 0, 0.6);
 }
 
+/* Modal para foto y también para embed (se diferencia por la clase embed-modal) */
 .modal .modal-content {
   position: absolute;
   top: var(--modal-top);
@@ -425,6 +425,46 @@ body {
   flex-direction: column;
   transform: translate(-5px,-20px);
   margin: 20px;
+}
+
+/* Estilos para la modal de Embed */
+.embed-modal .modal-content {
+  width: 500px;
+  height: auto;
+  top: 100px;
+  left: calc(50% - 250px);
+  transform: none;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.embed-modal .modal-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.embed-textarea {
+  width: 100%;
+  height: 120px;
+  margin-top: 10px;
+  font-family: monospace;
+  font-size: 14px;
+  resize: none;
+}
+
+.copy-btn {
+  margin-top: 10px;
+  padding: 8px 16px;
+  border: none;
+  background-color: #166fe5;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.copy-btn:hover {
+  background-color: #0e5bb5;
 }
 
 .login-facebook {
