@@ -36,34 +36,73 @@ function App() {
   const [sdkLoaded, setSdkLoaded] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalPost, setModalPost] = useState(null);
-  // Se mantiene internamente la funcionalidad de plantillas (por defecto la 1)
+  // Estado que guarda la plantilla seleccionada:
+  // 1: Vista Apilada, 2: Vista Celular, 3: Vista Tablet
   const [selectedTemplate, setSelectedTemplate] = useState(1);
   
-  // Estados para la modal de Embed
+  // Estados para la modal de Embed (donde se muestra el código generado)
   const [embedModalOpen, setEmbedModalOpen] = useState(false);
   const [embedCode, setEmbedCode] = useState('');
 
   // Detectar si se accede en modo embed
   const isEmbed = window.location.search.includes('embed=true');
 
-  // Token de acceso (reemplaza por tu token real)
-  const userToken = "EAASZCQLWDkywBO6uEXeYPaQcWWd97KH8w0vIHLylVjhRWNSeaXmItvJUJZBQTcppRl1cufg4VRria1jEZCogEaj3FXtYxuFyOV2xFgDMqhiFZA5nOw2xm5p00NglkCeOyP5qrsdfsuhzT0oilyyOoEUK2EusqxgVzQ2osJ58fKMsHMiiFonJDaeP";
+  useEffect(() => {
+    if (isEmbed) {
+      // En modo embed se llama a un endpoint seguro para obtener datos sin exponer el token.
+      fetchEmbedData();
+      return;
+    }
 
+    // Si no estamos en modo embed se carga el SDK de Facebook
+    if (window.FB) {
+      setSdkLoaded(true);
+      return;
+    }
+
+    window.fbAsyncInit = function () {
+      window.FB.init({
+        appId: '1336184550953772', 
+        cookie: true,
+        xfbml: true,
+        version: 'v22.0'
+      });
+      setSdkLoaded(true);
+    };
+
+    (function (d, s, id) {
+      let js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s);
+      js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js";
+      js.onerror = () => {
+        console.error('Error al cargar el SDK de Facebook');
+      };
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+  }, [isEmbed]);
+
+  // Enviar la plantilla seleccionada a embed.js cada vez que cambie
+  useEffect(() => {
+    window.postMessage({ type: 'TEMPLATE_SELECTED', template: selectedTemplate }, '*');
+  }, [selectedTemplate]);
+
+  // Listener para recibir el embed code enviado desde embed.js
   useEffect(() => {
     const handleMessage = (event) => {
-      // Validamos que el mensaje tenga la propiedad type y sea "EMBED_CODE"
       if (event.data && event.data.type === 'EMBED_CODE') {
         setEmbedCode(event.data.embedCode);
       }
     };
-  
+
     window.addEventListener('message', handleMessage);
     return () => {
       window.removeEventListener('message', handleMessage);
     };
   }, []);
 
-  // Función que llama a endpoints de tu backend para obtener perfil y publicaciones en modo embed
+  // Función para obtener datos en modo embed
   const fetchEmbedData = async () => {
     try {
       setLoading(true);
@@ -81,7 +120,39 @@ function App() {
     }
   };
 
-  // Función para obtener perfil usando el token de acceso
+  const handleLogin = () => {
+    if (!sdkLoaded) {
+      alert('El SDK de Facebook aún no se ha cargado, por favor intenta nuevamente en unos instantes.');
+      return;
+    }
+    setLoading(true);
+    window.FB.login(function (response) {
+      if (response.authResponse) {
+        const token = response.authResponse.accessToken;
+        fetchProfile(token);
+      } else {
+        alert('El inicio de sesión fue cancelado o no autorizado.');
+        setLoading(false);
+      }
+    }, { scope: 'public_profile,email,user_posts' });
+  };
+
+  const handleLogout = () => {
+    if (window.FB) {
+      window.FB.logout(() => {
+        setProfile(null);
+        setPosts([]);
+        localStorage.removeItem('profile');
+        localStorage.removeItem('posts');
+      });
+    } else {
+      setProfile(null);
+      setPosts([]);
+      localStorage.removeItem('profile');
+      localStorage.removeItem('posts');
+    }
+  };
+
   const fetchProfile = (token) => {
     window.FB.api('/me', { fields: 'name,picture.width(60).height(60)', access_token: token }, function (response) {
       if (response && !response.error) {
@@ -95,7 +166,6 @@ function App() {
     });
   };
 
-  // Función para obtener publicaciones usando el token de acceso
   const fetchPosts = (token) => {
     const fields = [
       'id',
@@ -141,22 +211,21 @@ function App() {
       (post.angry_reactions?.summary?.total_count || 0);
   };
 
-  // Función para generar el código embed (la seguridad está en el backend)
+  // Al presionar el botón "Genera Código Embed" se solicita el código embed a embed.js
   const handleGenerateEmbed = () => {
-    const baseUrl = 'https://9706-190-232-219-16.ngrok-free.app';
-    const embedUrl = `${baseUrl}/embed?embed=true&template=${selectedTemplate}`;
-    const code = `<iframe src="${embedUrl}" style="border:0; width:600px; height:800px;" frameborder="0"></iframe>`;
-    setEmbedCode(code);
+    // Enviar solicitud a embed.js con la plantilla actual
+    window.postMessage({ 
+      type: 'REQUEST_EMBED_CODE',
+      template: selectedTemplate,
+      baseUrl: window.location.origin
+    }, '*');
     setEmbedModalOpen(true);
   };
-  
-
   const copyToClipboard = () => {
     navigator.clipboard.writeText(embedCode);
     alert('Código copiado al portapapeles');
   };
 
-  // Función para redirigir al perfil de Facebook (modo normal)
   const handlePublish = () => {
     if (profile && profile.id) {
       window.open(`https://www.facebook.com/profile.php?id=${profile.id}`, "_blank");
@@ -165,28 +234,11 @@ function App() {
     }
   };
 
-  const handleLogout = () => {
-    if (window.FB) {
-      window.FB.logout(() => {
-        setProfile(null);
-        setPosts([]);
-        localStorage.removeItem('profile');
-        localStorage.removeItem('posts');
-      });
-    } else {
-      setProfile(null);
-      setPosts([]);
-      localStorage.removeItem('profile');
-      localStorage.removeItem('posts');
-    }
-  };
-
-  // Función para cambiar de plantilla (la funcionalidad se mantiene internamente)
+  // Función para cambiar de plantilla (con animación)
   const handleTemplateChange = (templateNumber) => {
     const isSameTemplate = selectedTemplate === templateNumber;
     const postsContainer = document.getElementById('posts');
-    // Nota: se usa la clase "fondo2" tal como en tu versión original
-    const fondo = document.querySelector('.fondo2');
+    const fondo = document.querySelector('.fondo');
     const postElements = postsContainer ? Array.from(postsContainer.children) : [];
     
     if (fondo) {
@@ -229,19 +281,70 @@ function App() {
     });
   };
 
-  // Modo embed: solo se muestra el widget de publicaciones
+  // Función para simular login en modo demo (usa tu token real)
+  const handleDemoLogin = () => {
+    const userToken = "EAASZCQLWDkywBO6uEXeYPaQcWWd97KH8w0vIHLylVjhRWNSeaXmItvJUJZBQTcppRl1cufg4VRria1jEZCogEaj3FXtYxuFyOV2xFgDMqhiFZA5nOw2xm5p00NglkCeOyP5qrsdfsuhzT0oilyyOoEUK2EusqxgVzQ2osJ58fKMsHMiiFonJDaeP";
+    
+    window.FB.api(
+      '/me', 
+      { 
+        fields: 'name,picture.width(60).height(60)', 
+        access_token: userToken 
+      },
+      (profileResponse) => {
+        if (profileResponse.error) {
+          console.error("Error en perfil:", profileResponse.error);
+          return;
+        }
+        
+        setProfile(profileResponse);
+        localStorage.setItem('profile', JSON.stringify(profileResponse));
+  
+        const postFields = [
+          'id',
+          'message',
+          'created_time',
+          'full_picture',
+          'permalink_url',
+          'shares',
+          'reactions.type(LIKE).summary(true).limit(0).as(like_reactions)',
+          'reactions.type(LOVE).summary(true).limit(0).as(love_reactions)',
+          'reactions.type(HAHA).summary(true).limit(0).as(haha_reactions)',
+          'reactions.type(WOW).summary(true).limit(0).as(wow_reactions)',
+          'reactions.type(SAD).summary(true).limit(0).as(sad_reactions)',
+          'reactions.type(ANGRY).summary(true).limit(0).as(angry_reactions)'
+        ].join(',');
+  
+        window.FB.api(
+          `/me/posts`, 
+          {
+            fields: postFields,
+            access_token: userToken
+          },
+          (postsResponse) => {
+            if (postsResponse.error) {
+              console.error("Error en publicaciones:", postsResponse.error);
+              return;
+            }
+            
+            setPosts(postsResponse.data || []);
+            localStorage.setItem('posts', JSON.stringify(postsResponse.data || []));
+          }
+        );
+      }
+    );
+  };
+  
+  // Si estamos en modo embed se muestra solo el widget sin controles adicionales.
   if (isEmbed) {
     return (
-      <div 
-        className="App" 
-        style={{ width: '100vw', height: '100vh', padding: '60px', marginTop: '1000px' }}
-      >
+      <div className="App">
         {loading ? (
           <div id="message" className="text-center fs-5 mb-4">
             Cargando publicaciones, por favor espera...
           </div>
         ) : (profile && posts.length > 0 ? (
-          <div id="posts" className={`fondo2 template-${selectedTemplate}`} style={{ marginLeft: '-20px' }}>
+          <div id="posts" className={`fondo template-${selectedTemplate}`}>
             {posts.map((post) => (
               <div key={post.id} className="post-col">
                 <div className="fb-post">
@@ -274,26 +377,96 @@ function App() {
     );
   }
 
-  // Modo normal: Se elimina cualquier navbar y el contenido ocupa toda la pantalla con margen lateral
+  // Modo normal (con navbar, sidebar, etc.)
   return (
-    <div 
-      className="App" 
-      style={{ width: '100vw', height: '100vh', margin: 0, padding: '0 20px' }}
-    >
-      <main 
-        className="main-content" 
-        style={{ width: '100%', height: '100vh', margin: 0, padding: 0, overflowY: 'auto' }}
-      >
+    <div className="App">
+      {/* Navbar */}
+      <nav className="custom-navbar">
+        <div className="container-fluid">
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg"
+            alt="Logo de Facebook"
+            className="fb-logo"
+            onClick={handleLogout}
+          />
+          <div className="container-fluid"><a>Feed Facebook</a></div>
+          <div className="buttons">
+            <button className="embed" onClick={handleGenerateEmbed}>Genera Código Embed</button>
+            <button className="publish" onClick={handlePublish}>Publish</button>
+            <button className="close" onClick={handleLogout}>Close</button>
+          </div>
+        </div>
+      </nav>
+
+      {/* Sidebar */}
+      <aside className="sidebar p-4">
+        <h5 className="mb-3 menu-lateral n">Source</h5>
+        <div className="ul-container">
+          <ul className="list-unstyled">
+            <p className="titulo-container">Contextual Menu</p>
+            <p className="comentario-container">
+              Authorize in your Facebook account to display the page you manage.
+            </p>
+            <br />
+            <p className="comentario-container2">Que estresante sacar el api de facebook</p>
+            <p>
+              {!profile && (
+                <>
+                  <button className="login-facebook" onClick={handleLogin}>
+                    <img
+                      src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg"
+                      alt="Facebook Logo"
+                      className="facebook-logo"
+                    />
+                    Iniciar sesión con Facebook
+                  </button>
+                  <button className="demo-mode" onClick={handleDemoLogin}>
+                    Vista Previa
+                  </button>
+                </>
+              )}
+            </p>
+            {profile && (
+              <p className="container-plantillas">
+                <h7>Plantillas:</h7>
+                <div className="plantilla-buttons">
+                  <button
+                    className={`plantilla-btn ${selectedTemplate === 1 ? 'active' : ''}`}
+                    onClick={() => handleTemplateChange(1)}
+                  >
+                    Plantilla en Vista Apilada
+                  </button>
+                  <button
+                    className={`plantilla-btn ${selectedTemplate === 2 ? 'active' : ''}`}
+                    onClick={() => handleTemplateChange(2)}
+                  >
+                    Plantilla Vista Celular
+                  </button>
+                  <button
+                    className={`plantilla-btn ${selectedTemplate === 3 ? 'active' : ''}`}
+                    onClick={() => handleTemplateChange(3)}
+                  >
+                    Plantilla Vista Tablet
+                  </button>
+                </div>
+              </p>
+            )}
+          </ul>
+        </div>
+      </aside>
+
+      {/* Contenido principal */}
+      <main className="main-content p-4">
         {!profile ? (
           <div id="message" className="text-center fs-5 mb-4">
-            Esperando carga de datos...
+            Esperando Inicio de Sesión
           </div>
         ) : loading ? (
           <div id="message" className="text-center fs-5 mb-4">
             Cargando publicaciones, por favor espera...
           </div>
         ) : (
-          <div id="posts" className={`fondo2 template-${selectedTemplate}`} style={{ marginLeft: '-20px' }}>
+          <div id="posts" className={`fondo template-${selectedTemplate}`}>
             {posts.map((post) => (
               <div key={post.id} className="post-col d-flex">
                 <div className="fb-post">
@@ -415,6 +588,7 @@ function App() {
         </div>
       )}
 
+      {/* Modal de Embed */}
       {embedModalOpen && (
         <div 
           className="modal embed-modal" 

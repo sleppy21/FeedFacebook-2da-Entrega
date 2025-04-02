@@ -33,7 +33,6 @@ function App() {
   const [profile, setProfile] = useState(null);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [sdkLoaded, setSdkLoaded] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalPost, setModalPost] = useState(null);
   // Se mantiene internamente la funcionalidad de plantillas (por defecto la 1)
@@ -50,18 +49,48 @@ function App() {
   const userToken = "EAASZCQLWDkywBO6uEXeYPaQcWWd97KH8w0vIHLylVjhRWNSeaXmItvJUJZBQTcppRl1cufg4VRria1jEZCogEaj3FXtYxuFyOV2xFgDMqhiFZA5nOw2xm5p00NglkCeOyP5qrsdfsuhzT0oilyyOoEUK2EusqxgVzQ2osJ58fKMsHMiiFonJDaeP";
 
   useEffect(() => {
+    // Listener para el mensaje EMBED_CODE
     const handleMessage = (event) => {
-      // Validamos que el mensaje tenga la propiedad type y sea "EMBED_CODE"
       if (event.data && event.data.type === 'EMBED_CODE') {
         setEmbedCode(event.data.embedCode);
       }
     };
-  
+
     window.addEventListener('message', handleMessage);
     return () => {
       window.removeEventListener('message', handleMessage);
     };
   }, []);
+
+  // Cargar datos al montar el componente
+  useEffect(() => {
+    if (isEmbed) {
+      // En modo embed, obtenemos datos desde el backend
+      fetchEmbedData();
+    } else {
+      // En modo normal, se intenta cargar desde localStorage o se llama a la API de Facebook
+      const storedProfile = localStorage.getItem('profile');
+      const storedPosts = localStorage.getItem('posts');
+      if (storedProfile && storedPosts) {
+        setProfile(JSON.parse(storedProfile));
+        setPosts(JSON.parse(storedPosts));
+      } else {
+        setLoading(true);
+        fetchProfile(userToken);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEmbed]);
+
+  // Agregamos un efecto para enviar a la ventana padre la URL del iframe embed generado
+  useEffect(() => {
+    if (isEmbed) {
+      // Usamos la misma baseUrl que en handleGenerateEmbed
+      const baseUrl = 'https://9706-190-232-219-16.ngrok-free.app';
+      const embedUrl = `${baseUrl}/?embed=true&template=${selectedTemplate}`;
+      window.parent.postMessage({ type: 'EMBED_URL', url: embedUrl }, '*');
+    }
+  }, [isEmbed, selectedTemplate]);
 
   // Función que llama a endpoints de tu backend para obtener perfil y publicaciones en modo embed
   const fetchEmbedData = async () => {
@@ -83,6 +112,11 @@ function App() {
 
   // Función para obtener perfil usando el token de acceso
   const fetchProfile = (token) => {
+    if (!window.FB) {
+      console.error("La SDK de Facebook no está cargada.");
+      setLoading(false);
+      return;
+    }
     window.FB.api('/me', { fields: 'name,picture.width(60).height(60)', access_token: token }, function (response) {
       if (response && !response.error) {
         setProfile(response);
@@ -144,12 +178,13 @@ function App() {
   // Función para generar el código embed (la seguridad está en el backend)
   const handleGenerateEmbed = () => {
     const baseUrl = 'https://9706-190-232-219-16.ngrok-free.app';
-    const embedUrl = `${baseUrl}/embed?embed=true&template=${selectedTemplate}`;
+    const embedUrl = `${baseUrl}/?embed=true&template=${selectedTemplate}`;
     const code = `<iframe src="${embedUrl}" style="border:0; width:600px; height:800px;" frameborder="0"></iframe>`;
     setEmbedCode(code);
     setEmbedModalOpen(true);
+    // Opcionalmente, también se puede enviar la URL aquí:
+    window.postMessage({ type: 'EMBED_URL', url: embedUrl }, '*');
   };
-  
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(embedCode);
@@ -185,7 +220,6 @@ function App() {
   const handleTemplateChange = (templateNumber) => {
     const isSameTemplate = selectedTemplate === templateNumber;
     const postsContainer = document.getElementById('posts');
-    // Nota: se usa la clase "fondo2" tal como en tu versión original
     const fondo = document.querySelector('.fondo2');
     const postElements = postsContainer ? Array.from(postsContainer.children) : [];
     
