@@ -1,74 +1,59 @@
-<<<<<<< HEAD
-# Getting Started with Create React App
+# Aplicación de Feed de Facebook
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Esta aplicación es un proyecto de React que se integra con el SDK de Facebook para mostrar el perfil y las publicaciones de un usuario de Facebook. La aplicación admite diferentes plantillas de visualización y puede ser incrustada en otras páginas web.
 
-## Available Scripts
+## Características
 
-In the project directory, you can run:
+- **Inicio de Sesión con Facebook**: Los usuarios pueden iniciar sesión utilizando su cuenta de Facebook para ver su perfil y publicaciones.
+- **Modo Embed**: La aplicación puede ser incrustada en otras páginas web con diferentes plantillas de visualización.
+- **Selección de Plantillas**: Los usuarios pueden elegir entre diferentes plantillas para mostrar las publicaciones.
+- **Modo Demo**: Simula el inicio de sesión con un token de demostración para previsualizar la funcionalidad de la aplicación.
+- **Diseño Responsivo**: La aplicación está diseñada para ser responsiva y funciona bien en diferentes tamaños de pantalla.
 
-### `npm start`
+## Configuración
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+1. **Clonar el repositorio**:
+   ```bash
+   git clone https://github.com/tu-usuario/facebook-feed-app.git
+   cd facebook-feed-app
+   ```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+2. **Instalar dependencias**:
+   ```bash
+   npm install
+   ```
 
-### `npm test`
+3. **Ejecutar la aplicación**:
+   ```bash
+   npm start
+   ```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+4. **Abrir la aplicación**:
+   Abre tu navegador y navega a `http://localhost:3000`.
 
-### `npm run build`
+## Uso
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- **Iniciar Sesión con Facebook**: Haz clic en "Iniciar sesión con Facebook" para iniciar sesión y ver tu perfil y publicaciones.
+- **Seleccionar Plantilla**: Usa la barra lateral para elegir entre diferentes plantillas para ver las publicaciones.
+- **Generar Código Embed**: Haz clic en "Genera Código Embed" para generar un código de incrustación para la plantilla seleccionada.
+- **Modo Demo**: Haz clic en "Vista Previa" para simular el inicio de sesión y ver un perfil y publicaciones de demostración.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Modo Embed
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Para usar la aplicación en modo embed, añade `?embed=true` al URL. Este modo obtiene datos de manera segura sin exponer el token.
 
-### `npm run eject`
+## Manejo de Errores
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+La aplicación intercepta errores específicos de la consola relacionados con solicitudes fallidas para evitar que saturen la consola.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Licencia
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Este proyecto está licenciado bajo la Licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Contribuciones
 
-## Learn More
+¡Las contribuciones son bienvenidas! Por favor, abre un issue o envía un pull request para cualquier mejora o corrección de errores.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Contacto
 
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
-=======
-# FeedFacebook-2da-Entrega
->>>>>>> 6c51ee51c7d52411f393da4c87815cead790e76f
+Para preguntas o soporte, por favor contacta a [spiritboom672@gmail.com](mailto:spiritboom672@gmail.com).
