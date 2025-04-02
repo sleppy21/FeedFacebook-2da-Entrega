@@ -213,17 +213,31 @@ function App() {
 
   // Al presionar el botón "Genera Código Embed" se solicita el código embed a embed.js
   const handleGenerateEmbed = () => {
-    // Enviar solicitud a embed.js con la plantilla actual
-    window.postMessage({ 
-      type: 'REQUEST_EMBED_CODE',
-      template: selectedTemplate,
-      baseUrl: window.location.origin
-    }, '*');
     setEmbedModalOpen(true);
   };
+
+  const handleEmbedTemplateChange = (templateNumber) => {
+    setSelectedTemplate(templateNumber);
+    let embedSrc;
+    switch (templateNumber) {
+      case 1:
+        embedSrc = "https://y-sage-nine.vercel.app/";
+        break;
+      case 2:
+        embedSrc = "https://n-eight-gamma.vercel.app/";
+        break;
+      case 3:
+        embedSrc = "https://z-psi-nine.vercel.app/";
+        break;
+      default:
+        embedSrc = "";
+    }
+    setEmbedCode(`<iframe src="${embedSrc}" name="myIFrame" scrolling="auto" width="100%" height="100%" style="border: solid #b0b0b0;"></iframe>`);
+  };
+
   const copyToClipboard = () => {
     navigator.clipboard.writeText(embedCode);
-    alert('Código copiado al portapapeles');
+    // Removed alert message
   };
 
   const handlePublish = () => {
@@ -602,7 +616,39 @@ function App() {
           <div className="modal-content embed-modal-content">
             <button className="modal-close" onClick={() => setEmbedModalOpen(false)}>X</button>
             <div className="modal-body">
-              <h3>Código Embed</h3>
+              <h3>Seleccione la plantilla para generar el código Embed</h3>
+              <div>
+                <label>
+                  <input 
+                    type="radio" 
+                    name="embedTemplate" 
+                    value="1" 
+                    checked={selectedTemplate === 1} 
+                    onChange={() => handleEmbedTemplateChange(1)} 
+                  />
+                  Vista Apilada
+                </label>
+                <label>
+                  <input 
+                    type="radio" 
+                    name="embedTemplate" 
+                    value="2" 
+                    checked={selectedTemplate === 2} 
+                    onChange={() => handleEmbedTemplateChange(2)} 
+                  />
+                  Vista Celular
+                </label>
+                <label>
+                  <input 
+                    type="radio" 
+                    name="embedTemplate" 
+                    value="3" 
+                    checked={selectedTemplate === 3} 
+                    onChange={() => handleEmbedTemplateChange(3)} 
+                  />
+                  Vista Tablet
+                </label>
+              </div>
               <textarea 
                 className="embed-textarea" 
                 readOnly 
